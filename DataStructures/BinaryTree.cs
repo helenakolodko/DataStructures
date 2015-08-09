@@ -57,10 +57,12 @@ namespace DataStructures
                 itemCells[0] = new Node<T>(value);
                 next++;
             }
-            else if (count >= capacity)
-                ExpandItemsArray();
             else
+            {
+                if (count >= capacity)
+                    ExpandItemsArray();
                 Insert(value);
+            }
             count++;
         }
 
@@ -110,12 +112,9 @@ namespace DataStructures
         {
             int position = -1;
             if (freeCount > 0)
-                position = freeCells[freeCount - 1];
+                position = freeCells[freeCount-- - 1];
             else
-            {
-                position = next;
-                next++;
-            }
+                position = next++;
             itemCells[position] = new Node<T>(value);
 
             int parentIndex = FindParentPosition(value);

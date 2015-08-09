@@ -9,17 +9,44 @@ namespace Tests
     public class BinaryTreeTest
     {
         [TestMethod]
-        public void Preorder()
+        public void Add_ToFullIntTree_ExpandsTree()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new int[] { 54, 25, 316, 4, 55, 6, });
+            tree.Add(11);
+            tree.Add(41);
+            tree.Add(111);
+            Assert.AreEqual(9, tree.Count);
+        }
+
+        [TestMethod]
+        public void Add_ToFullIntTree_AddItemsRight()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new int[] { 54, 25, 316, 4, 55, 6, });
+            tree.Add(11);
+            tree.Add(41);
+            tree.Add(111);
+            int[] actual = new int[9];
+            int i = 0;
+            foreach (var item in tree.InOrderTraversal)
+                actual[i++] = item;
+            IStructuralEquatable expected = new int[] { 4, 6, 11, 25, 41, 54, 55, 111, 316 };
+            Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
+        }
+
+        [TestMethod]
+        public void PreOrderTraversal_OnIntTree_EnumeratesInCorrectOrder()
         {
             BinaryTree<int> tree = new BinaryTree<int>(new int[]{54, 25, 316, 4, 55, 6,});
             int[] actual = new int[6];
             int i = 0;
             foreach (var item in tree)
                 actual[i++] = item;
+            //IStructuralEquatable expected = new int[] { 4, 6, 25, 54, 55, 316 };
+            //Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
         }
 
         [TestMethod]
-        public void Inorder()
+        public void InOrderTraversal_OnIntTree_EnumeratesInCorrectOrder()
         {
             BinaryTree<int> tree = new BinaryTree<int>(new int[] { 54, 25, 316, 4, 55, 6, });
             int[] actual = new int[6];
@@ -32,14 +59,16 @@ namespace Tests
         }
 
         [TestMethod]
-        public void Postorder()
+        public void PostOrderTraversal_OnIntTree_EnumeratesInCorrectOrder()
         {
             BinaryTree<int> tree = new BinaryTree<int>(new int[] { 54, 25, 316, 4, 55, 6, });
             int[] actual = new int[6];
             int i = 0;
             foreach (var item in tree.PostOrderTraversal)
                 actual[i++] = item;
-
+            //IStructuralEquatable expected = new int[] { 4, 6, 25, 54, 55, 316 };
+            //Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
         }
+
     }
 }
