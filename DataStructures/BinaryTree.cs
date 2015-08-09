@@ -108,24 +108,19 @@ namespace DataStructures
         {
             if (current < 0)
                 return;
-            int comparisonResult = comparison(value, itemCells[current].Value);
-            if (comparisonResult < 0)
-                Remove(itemCells[current].Left, value);
-            else if (comparisonResult > 0)
-                Remove(itemCells[current].Right, value);
+            
+            if (itemCells[current].Left >= 0 && itemCells[current].Right >= 0)
+            {
+                int successor = FindMinInSubtreePosition(itemCells[current].Right);
+                itemCells[current].Value = itemCells[successor].Value;
+                Remove(successor, itemCells[successor].Value);
+            }
+            else if (itemCells[current].Left >= 0)
+                ReplaceChildInParent(current, itemCells[current].Left);
+            else if (itemCells[current].Right >= 0)
+                ReplaceChildInParent(current, itemCells[current].Right);
             else
-                if (itemCells[current].Left >= 0 && itemCells[current].Right >= 0)
-                {
-                    int successor = FindMinInSubtreePosition(itemCells[current].Right);
-                    itemCells[current].Value = itemCells[successor].Value;
-                    Remove(successor, itemCells[successor].Value);
-                }
-                else if (itemCells[current].Left >= 0)
-                    ReplaceChildInParent(current, itemCells[current].Left);
-                else if (itemCells[current].Right >= 0)
-                    ReplaceChildInParent(current, itemCells[current].Right);
-                else
-                    ReplaceChildInParent(current, -1);
+                ReplaceChildInParent(current, -1);
         }
 
         private int FindMinInSubtreePosition(int rootIndex)
