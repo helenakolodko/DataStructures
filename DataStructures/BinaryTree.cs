@@ -10,11 +10,13 @@ namespace DataStructures
             internal T Value;
             internal int Left;
             internal int Right;
-            public Node(T value)
+            internal int Parent;
+            public Node(T value, int parent)
             {
                 Value = value;
                 Left = -1;
                 Right = -1;
+                Parent = parent;
             }
         }
 
@@ -28,7 +30,6 @@ namespace DataStructures
         private Comparison<T> comparison;
          
         public int Count { get { return count; } }
-
         public IEnumerable<T> PreOrderTraversal { get { return GetPreOrder(root); } }
         public IEnumerable<T> InOrderTraversal { get { return GetInOrder(root); } }
         public IEnumerable<T> PostOrderTraversal { get { return GetPostOrder(root); } }
@@ -54,7 +55,7 @@ namespace DataStructures
         {
             if (count == 0)
             {
-                itemCells[0] = new Node<T>(value);
+                itemCells[0] = new Node<T>(value, -1);
                 next++;
             }
             else
@@ -68,23 +69,26 @@ namespace DataStructures
 
         public void Remove(T value)
         {
+            int found = FindItemPosition(value);
+            if (found >= 0)
+            {
+                if (found == root)
+                    if (count == 1)
+                        root = -1;
+                    else if (itemCells[found].Left >= 0 ^ itemCells[found].Right >= 0)
+                        root = itemCells[found].Left >= 0 ? itemCells[found].Left : itemCells[found].Right;
 
+                Remove(found, value);
+                count--;
+                AddToFreeCells(found);
+            }
+            else
+                throw new InvalidOperationException("Binary Tree doesn't contain this value.");
         }
 
         public bool Contains(T value)
         {
-            int current = root;
-            while (current > 0)
-            {
-                int comparisonResult = comparison(value, itemCells[current].Value);
-                if (comparisonResult == 0)
-                    return true;
-                if (comparisonResult > 0)
-                    current = itemCells[current].Right;
-                else
-                    current = itemCells[current].Left;
-            }
-            return false;
+            return FindItemPosition(value) >= 0;
         }
 
         public IEnumerator<T> GetEnumerator()
@@ -100,6 +104,64 @@ namespace DataStructures
             return GetEnumerator();
         }
 
+        private void Remove(int current, T value)
+        {
+            if (current < 0)
+                return;
+            int comparisonResult = comparison(value, itemCells[current].Value);
+            if (comparisonResult < 0)
+                Remove(itemCells[current].Left, value);
+            else if (comparisonResult > 0)
+                Remove(itemCells[current].Right, value);
+            else
+                if (itemCells[current].Left >= 0 && itemCells[current].Right >= 0)
+                {
+                    int successor = FindMinInSubtreePosition(itemCells[current].Right);
+                    itemCells[current].Value = itemCells[successor].Value;
+                    Remove(successor, itemCells[successor].Value);
+                }
+                else if (itemCells[current].Left >= 0)
+                    ReplaceChildInParent(current, itemCells[current].Left);
+                else if (itemCells[current].Right >= 0)
+                    ReplaceChildInParent(current, itemCells[current].Right);
+                else
+                    ReplaceChildInParent(current, -1);
+        }
+
+        private int FindMinInSubtreePosition(int rootIndex)
+        {
+            int current = rootIndex;
+            while (itemCells[current].Left >= 0)
+                current = itemCells[current].Left;
+            return current;
+        }
+
+        private void ReplaceChildInParent(int current, int newIndex)
+        {
+            int parent = itemCells[current].Parent;
+            if (parent >= 0)
+                if (itemCells[parent].Left == current)
+                    itemCells[parent].Left = newIndex;
+                else
+                    itemCells[parent].Right = newIndex;
+            if (newIndex >= 0)
+                itemCells[newIndex].Parent = parent;
+        }
+
+        private void AddToFreeCells(int found)
+        {
+            if (freeCells == null)
+                freeCells = new int[16];
+            else if (freeCells.Length <= freeCount)
+            {
+                int[] temp = new int[freeCount*2];
+                Array.Copy(freeCells, temp, freeCells.Length);
+                freeCells = temp;
+            }
+            freeCells[freeCount] = found;
+            freeCount++;
+        }
+
         private void ExpandItemsArray()
         {
             capacity *= 2;
@@ -110,23 +172,42 @@ namespace DataStructures
 
         private void Insert(T value)
         {
+            int parent = FindInsertPosition(value);
+            int position = AddToArray(value, parent);
+            if (comparison(value, itemCells[parent].Value) > 0)
+                itemCells[parent].Right = position;
+            else
+                itemCells[parent].Left = position;
+        }
+
+        private int AddToArray(T value, int parent)
+        {
             int position = -1;
             if (freeCount > 0)
                 position = freeCells[freeCount-- - 1];
             else
                 position = next++;
-            itemCells[position] = new Node<T>(value);
-
-            int parentIndex = FindParentPosition(value);
-            Node<T> parent = itemCells[parentIndex];
-            if (comparison(value, parent.Value) > 0)
-                parent.Right = position;
-            else
-                parent.Left = position;
-            itemCells[parentIndex] = parent;
+            itemCells[position] = new Node<T>(value, parent);
+            return position;
         }
 
-        private int FindParentPosition(T value)
+        private int FindItemPosition(T value)
+        {
+            int current = root;
+            while (current >= 0)
+            {
+                int comparisonResult = comparison(value, itemCells[current].Value);
+                if (comparisonResult == 0)
+                    return current;
+                if (comparisonResult > 0)
+                    current = itemCells[current].Right;
+                else
+                    current = itemCells[current].Left;
+            }
+            return -1;
+        }
+
+        private int FindInsertPosition(T value)
         {
             int parent = root;
             int current = root;
