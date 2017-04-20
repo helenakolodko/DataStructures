@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DataStructures
+﻿namespace DataStructures
 {
     public class LinkedList<T>
     {
