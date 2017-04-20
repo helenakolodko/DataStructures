@@ -126,5 +126,29 @@ namespace Tests
             Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
         }
 
+        [TestMethod]
+        public void Balance_OnUnbalancedTree_MakesBalanced()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new[] { 54, 25, 316, 4, 55, 6, 75 });
+
+            tree.Balance();
+            int[] actual = tree.PostOrderTraversal.ToArray();
+
+            IStructuralEquatable expected = new[] { 4, 25, 6, 55, 316, 75, 54 };
+            Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
+        }
+        
+        [TestMethod]
+        public void Balance_OnOneBranchTree_MakesBalanced()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new[] { 4, 6, 25, 54, 55, 75, 316 });
+
+            tree.Balance();
+            int[] actual = tree.PostOrderTraversal.ToArray();
+
+            IStructuralEquatable expected = new[] { 4, 25, 6, 55, 316, 75, 54 };
+            Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
+        }
+
     }
 }

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 
 namespace DataStructures
 {
@@ -91,6 +94,30 @@ namespace DataStructures
             return FindItemPosition(value) >= 0;
         }
 
+        public void Balance()
+        {
+            if (root >= 0)
+            {
+                var orderedIndexes = GetInOrderIndexes(root).ToArray();
+                root = BalanceSubtree(orderedIndexes, -1, 0, orderedIndexes.Length);
+            }
+        }
+
+        private int BalanceSubtree(int[] orderedIndexes, int parent, int start, int end)
+        {
+            if (end > start)
+            {
+                var rootIndex = start + (end - start) / 2;
+                var index = orderedIndexes[rootIndex];
+                itemCells[index].Parent = parent;
+                itemCells[index].Left = BalanceSubtree(orderedIndexes, index, start, rootIndex);
+                itemCells[index].Right = BalanceSubtree(orderedIndexes, index, rootIndex + 1, end);
+                return index;
+            }
+            else
+                return -1;
+        }
+
         public IEnumerator<T> GetEnumerator()
         {
             foreach (var value in GetPreOrder(root))
@@ -99,7 +126,7 @@ namespace DataStructures
             }
         }
 
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
@@ -243,6 +270,22 @@ namespace DataStructures
                 }
                 yield return itemCells[subtreePosition].Value;
                 foreach (var value in GetInOrder(itemCells[subtreePosition].Right))
+                {
+                    yield return value;
+                }
+            }
+        }
+
+        private IEnumerable<int> GetInOrderIndexes(int subtreePosition)
+        {
+            if (subtreePosition != -1)
+            {
+                foreach (var value in GetInOrderIndexes(itemCells[subtreePosition].Left))
+                {
+                    yield return value;
+                }
+                yield return subtreePosition;
+                foreach (var value in GetInOrderIndexes(itemCells[subtreePosition].Right))
                 {
                     yield return value;
                 }
