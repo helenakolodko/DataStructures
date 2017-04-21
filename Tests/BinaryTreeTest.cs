@@ -10,6 +10,52 @@ namespace Tests
     public class BinaryTreeTest
     {
         [TestMethod]
+        public void Create_WithNoArgumentsProvided_CreatesEmptyTree()
+        {
+            BinaryTree<string> tree = new BinaryTree<string>();
+
+            Assert.AreEqual(0, tree.Count);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Create_WithNullArgument_ThrowsException()
+        {
+            string[] items = null;
+            BinaryTree<string> tree = new BinaryTree<string>(items);
+        }
+
+
+        [TestMethod]
+        public void Create_WithItemsProvided_AddsAllItemsToTree()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new[] { 54, 25, 316, 4, 55, 6, });
+
+            Assert.AreEqual(6, tree.Count);
+        }
+
+        [TestMethod]
+        public void Add_ToEmptyTree_IncreasesCount()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>();
+
+            tree.Add(11);
+
+            Assert.AreEqual(1, tree.Count);
+        }
+
+        [TestMethod]
+        public void Add_ToNonEmptyTree_IncreasesCount()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>();
+
+            tree.Add(11);
+            tree.Add(5);
+
+            Assert.AreEqual(2, tree.Count);
+        }
+
+        [TestMethod]
         public void Add_ToFullIntTree_ExpandsTree()
         {
             BinaryTree<int> tree = new BinaryTree<int>(new[] { 54, 25, 316, 4, 55, 6, });
