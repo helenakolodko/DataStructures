@@ -21,7 +21,7 @@ namespace Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "Hash Table already contains value with this key.")]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void Add_DuplicateKey_ThrowsException()
         {
             HashTable<int, string> table = new HashTable<int, string>();
@@ -45,7 +45,7 @@ namespace Tests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "Hash Table already contains value with this key.")]
+        [ExpectedException(typeof(InvalidOperationException))]
         public void Get_ByNonExistingKey_ThrowsException()
         {
             HashTable<int, string> table = new HashTable<int, string>();

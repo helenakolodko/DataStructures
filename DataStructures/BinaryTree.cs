@@ -37,6 +37,10 @@ namespace DataStructures
         public IEnumerable<T> InOrderTraversal { get { return GetInOrder(root); } }
         public IEnumerable<T> PostOrderTraversal { get { return GetPostOrder(root); } }
 
+        public BinaryTree()
+           : this(Comparer<T>.Default)
+        { }
+
         public BinaryTree(IComparer<T> comparer)
             : this(16, comparer.Compare)
         { }
@@ -81,7 +85,7 @@ namespace DataStructures
                     else if (itemCells[found].Left >= 0 ^ itemCells[found].Right >= 0)
                         root = itemCells[found].Left >= 0 ? itemCells[found].Left : itemCells[found].Right;
 
-                Remove(found, value);
+                Remove(found);
                 count--;
                 AddToFreeCells(found);
             }
@@ -102,6 +106,19 @@ namespace DataStructures
                 root = BalanceSubtree(orderedIndexes, -1, 0, orderedIndexes.Length);
             }
         }
+        
+        public IEnumerator<T> GetEnumerator()
+        {
+            foreach (var value in GetPreOrder(root))
+            {
+                yield return value;
+            }
+        }
+
+        IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
 
         private int BalanceSubtree(int[] orderedIndexes, int parent, int start, int end)
         {
@@ -118,20 +135,7 @@ namespace DataStructures
                 return -1;
         }
 
-        public IEnumerator<T> GetEnumerator()
-        {
-            foreach (var value in GetPreOrder(root))
-            {
-                yield return value;
-            }
-        }
-
-        IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        private void Remove(int current, T value)
+        private void Remove(int current)
         {
             if (current < 0)
                 return;
@@ -140,7 +144,7 @@ namespace DataStructures
             {
                 int successor = FindMinInSubtreePosition(itemCells[current].Right);
                 itemCells[current].Value = itemCells[successor].Value;
-                Remove(successor, itemCells[successor].Value);
+                Remove(successor);
             }
             else if (itemCells[current].Left >= 0)
                 ReplaceChildInParent(current, itemCells[current].Left);
@@ -246,7 +250,7 @@ namespace DataStructures
 
         private IEnumerable<T> GetPreOrder(int subtreePosition)
         {
-            if (subtreePosition != -1)
+            if (subtreePosition != -1 && count > 0)
             {
                 yield return itemCells[subtreePosition].Value;
                 foreach (var value in GetPreOrder(itemCells[subtreePosition].Left))
@@ -262,7 +266,7 @@ namespace DataStructures
 
         private IEnumerable<T> GetInOrder(int subtreePosition)
         {
-            if (subtreePosition != -1)
+            if (subtreePosition != -1 && count > 0)
             {
                 foreach (var value in GetInOrder(itemCells[subtreePosition].Left))
                 {
@@ -278,7 +282,7 @@ namespace DataStructures
 
         private IEnumerable<int> GetInOrderIndexes(int subtreePosition)
         {
-            if (subtreePosition != -1)
+            if (subtreePosition != -1 && count > 0)
             {
                 foreach (var value in GetInOrderIndexes(itemCells[subtreePosition].Left))
                 {
@@ -294,7 +298,7 @@ namespace DataStructures
 
         private IEnumerable<T> GetPostOrder(int subtreePosition)
         {
-            if (subtreePosition != -1)
+            if (subtreePosition != -1 && count > 0)
             {
                 foreach (var value in GetPostOrder(itemCells[subtreePosition].Left))
                 {

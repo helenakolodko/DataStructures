@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using DataStructures;
 using System.Collections;
 using System.Linq;
@@ -79,6 +80,35 @@ namespace Tests
         }
 
         [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public void Remove_NonExistingElement_ThrowsException()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new[] { 54, 25, 316, 4, 55, 6, });
+
+            tree.Remove(5);
+        }
+
+        [TestMethod]
+        public void Contains_WithExistingElement_ReturnesTrue()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new[] { 54, 25, 316, 4, 55, 6, });
+
+            var contains = tree.Contains(316);
+            
+            Assert.IsTrue(contains);
+        }
+
+        [TestMethod]
+        public void Contains_WithNonExistingElement_ReturnesFalse()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new[] { 54, 25, 316, 4, 55, 6, });
+
+            var contains = tree.Contains(315);
+
+            Assert.IsFalse(contains);
+        }
+
+        [TestMethod]
         public void Add_ToFullIntTree_AddsItemsRight()
         {
             BinaryTree<int> tree = new BinaryTree<int>(new[] { 54, 25, 316, 4, 55, 6, });
@@ -90,6 +120,18 @@ namespace Tests
 
             IStructuralEquatable expected = new[] { 4, 6, 11, 25, 41, 54, 55, 111, 316 };
             Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
+        }
+
+        [TestMethod]
+        public void Enumerate_OnEmptyTree_ReturnsEmptyResult()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>();
+
+            int[] actual = tree.ToArray();
+
+            IStructuralEquatable expected = new int[] {  };
+            Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
+
         }
 
         [TestMethod]
@@ -137,7 +179,7 @@ namespace Tests
             IStructuralEquatable expected = new[] { 4, 25, 6, 55, 316, 75, 54 };
             Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
         }
-        
+
         [TestMethod]
         public void Balance_OnOneBranchTree_MakesBalanced()
         {
@@ -150,5 +192,28 @@ namespace Tests
             Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
         }
 
+        [TestMethod]
+        public void Balance_OnBalancedTree_MakesNoChanges()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>(new[] { 54, 6, 75, 4, 25, 55, 316 });
+
+            IStructuralEquatable expected = tree.PostOrderTraversal.ToArray();
+            tree.Balance();
+            int[] actual = tree.PostOrderTraversal.ToArray();
+            
+            Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
+        }
+
+        [TestMethod]
+        public void Balance_OnEmptyTree_MakesNoChanges()
+        {
+            BinaryTree<int> tree = new BinaryTree<int>();
+
+            IStructuralEquatable expected = tree.PostOrderTraversal.ToArray();
+            tree.Balance();
+            int[] actual = tree.PostOrderTraversal.ToArray();
+
+            Assert.IsTrue(expected.Equals(actual, StructuralComparisons.StructuralEqualityComparer));
+        }
     }
 }
